@@ -2,17 +2,21 @@
 <html>
 <head>
     <link href="static/css/style.css" rel="stylesheet">
-    <script type="text/javascript" src="static/jquery-1.6.1.min.js"></script>
+    <script type="text/javascript" src="static/lib/jquery.min.js"></script>
     <script type="text/javascript" src="static/socket.io.js"></script>
 
     <!--jquery ui-->
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 
+    <link rel="stylesheet" href="static/lib/bootstrap/css/bootstrap.css">
+    <script src="static/lib/bootstrap/js/bootstrap.js"></script>
+
     <!--bootstrap slider-->
-    <link rel="stylesheet" href="static/slider/css/slider.css">
-    <script src="static/slider/js/bootstrap-slider.js"></script>
+    <link rel="stylesheet" href="static/lib/slider/css/slider.css">
+    <script src="static/lib/slider/js/bootstrap-slider.js"></script>
+    <!--<link rel="stylesheet" href="static/slider/css/bootstrap-slider.css">-->
+    <!--<script src="static/slider/bootstrap-slider.min.js"></script>-->
     <!--<link rel="stylesheet" href="/resources/demos/style.css">-->
     <style>
         #draggable {
@@ -24,8 +28,21 @@
         }
     </style>
     <script>
-        $(function () {
-            $('#z-axis').slider({
+        $(document).ready(function () {
+            $('#zAxis').slider({
+                min: 0,
+                max: 10,
+                step: 1,
+                orientation: 'vertical',
+                value: 0,
+                selection: 'after',
+                tooltip: 'show',
+                handle: 'round',
+                formater: function (value) {
+                    return value;
+                }
+            }).on('slide', function (e) {
+//                console.log(e);
             });
             $("#draggable").draggable({
 //                helper: "clone",
@@ -149,15 +166,19 @@
 <!--<button>Send</button>-->
 <!--</form>-->
 <!--</div>-->
-<input id="z-axis" />
 
 <p id="axis">0.0</p>
 
-
-<div id="area" style="width:300px;height:300px;background-color:#dbe8f3">
-
-    <div id="draggable" class="ui-widget-content"></div>
-
+<div class="row">
+    <div class="col-lg-2">
+        <input id="zAxis"/>
+    </div>
+    <div class="col-lg-10">
+        <div id="area" style="width:300px;height:300px;background-color:#dbe8f3">
+            <div id="draggable" class="ui-widget-content"></div>
+        </div>
+    </div>
 </div>
+
 </body>
 </html>
