@@ -1,0 +1,41 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>jQuery UI Draggable - Default functionality</title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <style>
+        #draggable {
+            width: 50px;
+            height: 50px;
+            /*padding: 0.5em;*/
+            border-radius: 25px;
+            background-color: salmon;
+        }
+    </style>
+    <script>
+        $(function () {
+            $("#draggable").draggable({
+                appendTo: "#area",
+                cursor: "crosshair",
+                delay:0,
+                stop: function (e, ui) {
+                  $('#axis').text(e.clientX + "," + e.clientY)
+                },
+                drag: function (e, ui) {
+                    console.log(e)
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+<p id="axis"></p>
+<div id="draggable" class="ui-widget-content">
+</div>
+
+
+</body>
+</html>

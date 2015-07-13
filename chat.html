@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="static/css/style.css" rel="stylesheet">
+    <script type="text/javascript" src="static/jquery-1.6.1.min.js"></script>
+    <script type="text/javascript" src="static/socket.io.js"></script>
+
+    <!--jquery ui-->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+    <!--bootstrap slider-->
+    <link rel="stylesheet" href="static/slider/css/slider.css">
+    <script src="static/slider/js/bootstrap-slider.js"></script>
+    <!--<link rel="stylesheet" href="/resources/demos/style.css">-->
+    <style>
+        #draggable {
+            width: 5px;
+            height: 5px;
+            /*padding: 0.5em;*/
+            /*border-radius: 50%;*/
+            background: #678894;
+        }
+    </style>
+    <script>
+        $(function () {
+            $('#z-axis').slider({
+            });
+            $("#draggable").draggable({
+//                helper: "clone",
+//                appendTo: $("#area"),
+                containment: $('#area'),
+                scroll: false,
+                iframeFix: true,
+                cursor: "crosshair",
+                delay: 0,
+                stop: function (e, ui) {
+                    var axis = e.clientX + "," + e.clientY;
+                    $('#axis').text(e.clientX + "," + e.clientY);
+                    socket.emit('user message', axis);
+                },
+                drag: function (e, ui) {
+//                    console.log(e)
+                    var axis = e.clientX + "," + e.clientY;
+                    $('#axis').text(e.clientX + "," + e.clientY);
+                    socket.emit('user message', axis);
+                }
+            });
+            WEB_SOCKET_SWF_LOCATION = "/static/WebSocketMain.swf";
+            WEB_SOCKET_DEBUG = true;
+
+            // socket.io specific code
+            var socket = io.connect();
+
+            $(window).bind("beforeunload", function () {
+                socket.disconnect();
+            });
+
+            socket.on('connect', function () {
+                $('#chat').addClass('connected');
+                console.log('connected');
+            });
+
+            socket.on('announcement', function (msg) {
+                $('#lines').append($('<p>').append($('<em>').text(msg)));
+            });
+
+            socket.on('nicknames', function (nicknames) {
+                $('#nicknames').empty().append($('<span>Online: </span>'));
+                for (var i in nicknames) {
+                    $('#nicknames').append($('<b>').text(nicknames[i]));
+                }
+            });
+
+            socket.on('msg_to_room', message);
+
+            socket.on('reconnect', function () {
+                $('#lines').remove();
+                message('System', 'Reconnected to the server');
+            });
+
+            socket.on('reconnecting', function () {
+                message('System', 'Attempting to re-connect to the server');
+            });
+
+            socket.on('error', function (e) {
+                message('System', e ? e : 'A unknown error occurred');
+            });
+
+            function message(from, msg) {
+                $('#lines').append($('<p>').append($('<b>').text(from), msg));
+            }
+
+            // DOM manipulation
+            $(function () {
+                $('#set-nickname').submit(function (ev) {
+                    socket.emit('nickname', $('#nick').val(), function (set) {
+                        if (!set) {
+                            clear();
+                            return $('#chat').addClass('nickname-set');
+                        }
+                        $('#nickname-err').css('visibility', 'visible');
+                    });
+                    return false;
+                });
+
+                $('#send-message').submit(function () {
+                    message('me', $('#message').val());
+                    socket.emit('user message', $('#message').val());
+                    clear();
+                    $('#lines').get(0).scrollTop = 10000000;
+                    return false;
+                });
+
+                function clear() {
+                    $('#message').val('').focus();
+                };
+            });
+//            init a session
+            socket.emit('nickname', 'shit', function (set) {
+                console.log('[session]' + set);
+            });
+        });
+    </script>
+    <script>
+
+
+    </script>
+</head>
+<body>
+<!--<div id="chat">-->
+<!--<div id="nickname">-->
+<!--<form id="set-nickname" class="wrap">-->
+<!--<p>Please type in your nickname and press enter.</p>-->
+<!--<input id="nick">-->
+<!--<p id="nickname-err">Nickname already in use</p>-->
+<!--</form>-->
+<!--</div>-->
+<!--<div id="connecting">-->
+<!--<div class="wrap">Connecting to socket.io server</div>-->
+<!--</div>-->
+<!--<div id="messages">-->
+<!--<div id="nicknames"><span>Online:</span></div>-->
+<!--<div id="lines"></div>-->
+<!--</div>-->
+<!--<form id="send-message">-->
+<!--<input id="message">-->
+<!--<button>Send</button>-->
+<!--</form>-->
+<!--</div>-->
+<input id="z-axis" />
+
+<p id="axis">0.0</p>
+
+
+<div id="area" style="width:300px;height:300px;background-color:#dbe8f3">
+
+    <div id="draggable" class="ui-widget-content"></div>
+
+</div>
+</body>
+</html>
